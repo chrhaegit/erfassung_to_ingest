@@ -3,8 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual Environment / VSCode
+# Virtual Environment / VSCode / tmpCode*.py
 .env/
 .vscode/
+tempCode*.py
+
+# data
+data/
+*.xlsx
+
 
 
