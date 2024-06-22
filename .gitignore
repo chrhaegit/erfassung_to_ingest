@@ -11,6 +11,7 @@ tempCode*.py
 # data
 data/
 *.xlsx
+*.txt
 
 
 

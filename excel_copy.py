@@ -6,42 +6,42 @@ from pathlib import Path
 class ExcelMapping:
     def __init__(self, inputfile, destinationfile):
         self.wb_input = load_workbook(inputfile, data_only=True)
-        self.ws_input = self.wb_input["data sheet"]
-
         self.ingest_path = destinationfile
         self.wb_ingest = load_workbook(destinationfile)
-        self.ws_ingest = self.wb_ingest["data sheet"]
 
     def colindex_bycolname(self, currworksheet, colname):
         retcolindex = 0
 
-        for colindex in range(1, 50):
+        for colindex in range(1, 50):  # only looks up in the first 50 cols 
             header_name = currworksheet.cell(row=1, column=colindex).value
             if header_name == colname:
                 retcolindex = colindex
                 break
         return retcolindex
+    
+    def map(self, src_colname, src_rownr, dest_colname, dest_rownr) -> bool:
+        src_colind = self.colindex_bycolname(self.wb_input["data sheet"], src_colname)
+        if not src_colind:
+            print(f"Error: No source header[{src_colname}] found in the input.xlsx")
+            return False
 
-    def do_mappings(self, test_mappings):
-        success = True
-        for src_colname, src_rownr, dest_colname, dest_rownr in test_mappings:
-            src_colind = self.colindex_bycolname(self.ws_input, src_colname)
-            if not src_colind:
-                print(f"Error: No source header[{src_colname}] found in the input.xlsx")
-                success = False
-                break
+        dest_colind = self.colindex_bycolname(self.wb_ingest["data sheet"], dest_colname)            
+        if not dest_colind:
+            print(f"Error: No destination header[{dest_colname}] found in the ingest-template")
+            return False
+        
+        source_cell_value = self.wb_input["data sheet"].cell(src_rownr, src_colind).value
+        self.wb_ingest["data sheet"].cell(dest_rownr, dest_colind).value = source_cell_value
+        self.wb_ingest.save(self.ingest_path)
+        return True                
 
-            source_cell_value = self.ws_input.cell(src_rownr, src_colind).value
-            dest_colind = self.colindex_bycolname(self.ws_ingest, dest_colname)            
-            if not dest_colind:
-                print(f"Error: No destination header[{dest_colname}] found in the ingest-template")
-                success = False
-                break
 
-            self.ws_ingest.cell(dest_rownr, dest_colind).value = source_cell_value
-        if success:
-            self.wb_ingest.save(self.ingest_path)
-        return success
+    def do_mappings(self, test_mappings):        
+        for src_colname, src_rownr, dest_colname, dest_rownr in test_mappings:               
+            if self.map(src_colname, src_rownr, dest_colname, dest_rownr):               
+                return False
+            
+        return True
 
 def test_mappings():
     # Define mappings of header names from inputfile.xlsx to ingest.xlsx
