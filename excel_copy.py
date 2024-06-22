@@ -38,7 +38,7 @@ class ExcelMapping:
 
     def do_mappings(self, test_mappings):        
         for src_colname, src_rownr, dest_colname, dest_rownr in test_mappings:               
-            if self.map(src_colname, src_rownr, dest_colname, dest_rownr):               
+            if not self.map(src_colname, src_rownr, dest_colname, dest_rownr):               
                 return False
             
         return True
@@ -51,24 +51,29 @@ def test_mappings():
         ('Vorname', 2, 'Vorname', 4)
     ]
 
-def filehandling(template_path, ingest_path):
+def filehandling(input_path, template_path, ingest_path):
+    if not input_path.exists():
+        print(f"Error: File '{input_path}' not found.")
+        return False
     if ingest_path.exists():
         ingest_path.unlink()
     
     if not template_path.exists():
         print("Error: templates.xlsx file not found.")
-        return
+        return False
     
     shutil.copy(template_path, ingest_path)
     print(f"Copied {template_path} to {ingest_path}")
+    return True
 
 def main(inputfile):
     print("*" *20, "  START  ", "*" *20)
-    filehandling(Path('./data/templates.xlsx'), Path('./ingest.xlsx'))
+    if not filehandling(Path(inputfile), Path('./data/templates.xlsx'), Path('./ingest.xlsx')):
+        return
     
     mapping = ExcelMapping(inputfile, Path('./ingest.xlsx'))
     if mapping.do_mappings(test_mappings()):
-        print(f"sucessfully created ingest-excel!")
+        print(f"sucessfully mapped to ingest-excel!")
     print("*" *20, "  ENDE  ", "*" *20)
 
 if __name__ == "__main__":
