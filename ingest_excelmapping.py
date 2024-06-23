@@ -57,9 +57,9 @@ class IngestExcelMapping:
         return True                
 
 
-    def do_mappings(self, test_mappings):    
+    def do_mappings(self, col_mappings):    
         for i in range(0, 6):    
-            for src_colname, src_rownr, dest_colname, dest_rownr in test_mappings:               
+            for src_colname, src_rownr, dest_colname, dest_rownr in col_mappings:               
                 if not self.map(src_colname, src_rownr+i, dest_colname, dest_rownr+i):               
                     return False            
         return True
@@ -104,3 +104,5 @@ if __name__ == "__main__":
 
     inputfile = sys.argv[1]
     main(inputfile)
+
+# %%
