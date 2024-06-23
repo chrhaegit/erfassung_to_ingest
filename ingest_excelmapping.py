@@ -3,7 +3,7 @@ import shutil
 from openpyxl import load_workbook
 from pathlib import Path
 
-class ExcelMapping:
+class IngestExcelMapping:
     def __init__(self, inputfile, destinationfile):
         self.wb_input = load_workbook(inputfile, data_only=True)
         self.ingest_path = destinationfile
@@ -66,7 +66,7 @@ def main(inputfile):
     print("*" *20, "  START  ", "*" *20)
     filehandling(Path('./data/templates.xlsx'), Path('./ingest.xlsx'))
     
-    mapping = ExcelMapping(inputfile, Path('./ingest.xlsx'))
+    mapping = IngestExcelMapping(inputfile, Path('./ingest.xlsx'))
     if mapping.do_mappings(test_mappings()):
         print(f"sucessfully created ingest-excel!")
     print("*" *20, "  ENDE  ", "*" *20)
